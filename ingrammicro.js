@@ -67,15 +67,15 @@ async function doUrl(url){
     return
 
   }
-  let response = {data: await fetch(url, {headers}, agent)}
+  let response = await fetch(url, {headers}).then(r => r.text())//{data: await fetch(url, {headers}, agent)}
 
   // fs.writeFileSync('x.html', response.data)
-  if(!response.data){
+  if(!response){
     debugger
     return
   }
-  let $ = cheerio.load(response.data)
-  let match = response.data.match(/var viewmodel =(\{.*\})/)
+  let $ = cheerio.load(response)
+  let match = response.match(/var viewmodel =(\{.*\})/)
   if(!match){
     debugger
 
@@ -104,9 +104,10 @@ async function doUrl(url){
     let images = $('img[src*=images],img[src*=prodpictures]').get().map(a => $(a).attr('src')).filter( unique ).join(', ')
     let pdfs = ""
 
-    response = {data: await fetch(url, {headers}, agent)}
-    if(response.data !== ""){
-      $ = cheerio.load(response.data)
+    // response = {data: await fetch(url, {headers}, agent)}
+    response = await fetch(url, {headers}).then(r => r.text())
+    if(response !== ""){
+      $ = cheerio.load(response)
       pdfs = $('a[href*="pdf"]').get().map(a => $(a).attr('href')).join(', ')
       // debugger
     }
