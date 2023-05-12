@@ -3,7 +3,7 @@ const axios = require('axios')
 const fs = require('fs')
 const csvWriter = require('csv-write-stream')
 const Datastore = require('nedb-promises')
-const {fetch, request} = require("./fetch")
+// const {fetch, request} = require("./fetch")
 
 const db = {
   products: Datastore.create('./db/products.db'),
@@ -49,7 +49,7 @@ function visited(str) {
   return false
 }
 
-let agent = request.agent()
+let agent = {}//request.agent()
 
 async function doUrl(url){
   if(visited(url)){
@@ -133,10 +133,9 @@ async function doUrl(url){
     for(let i=1;i<9999;i++){
 
 
-      let response = await axios({
+      let response = await fetch("https://sg.ingrammicro.com/Site/Search/DoSearch", {
         method: "post",
-        url: "https://sg.ingrammicro.com/Site/Search/DoSearch",
-        data: `Mode=12&Term=${i}&DeselectedTerm=&State=&Range=&SortMode=0&RecordPerPage=16&PageLayout=0&SortResultBy=&Page=0&PageZoneSearchState=&IsSimilarPopupPage=false&IsCrossSellPopupPage=false&IsCrossSellPopupWarrantyPage=false&CurrentCrossSellPage=0&CurrentCrossSellSkus=&ExchangeRate=&OffSet=0&TechSpecDataForHash=`,
+        body: `Mode=12&Term=${i}&DeselectedTerm=&State=&Range=&SortMode=0&RecordPerPage=16&PageLayout=0&SortResultBy=&Page=0&PageZoneSearchState=&IsSimilarPopupPage=false&IsCrossSellPopupPage=false&IsCrossSellPopupWarrantyPage=false&CurrentCrossSellPage=0&CurrentCrossSellSkus=&ExchangeRate=&OffSet=0&TechSpecDataForHash=`,
         headers: {
           "accept": "*/*",
           "accept-encoding": "gzip, deflate",
@@ -152,10 +151,10 @@ async function doUrl(url){
           "sec-fetch-mode": "cors",
           "sec-fetch-site": "same-origin",
           "user-agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/98.0.4758.82 Safari/537.36",
-          "x-requested-with": "XMLHttpReque",
+          "x-requested-with": "XMLHttpRequest",
         }
-      })
-      let $ = cheerio.load(response.data)
+      }).then(r => r.text())
+      let $ = cheerio.load(response)
       let as = $('.product-name a[data-displaysku]').get()
       for(let a of as){
         let url = new URL($(a).attr('href'), 'https://sg.ingrammicro.com/').href
