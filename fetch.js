@@ -46,6 +46,7 @@ async function fetch2(url, config = { headers }, agent = request) {
 async function fetch(url, config = { headers }, agent = request){
   let r
   while(!r){
+    console.log(url)
     r = await fetch2(url, config, agent).catch(e => {
       console.log(e?.message)
     })
